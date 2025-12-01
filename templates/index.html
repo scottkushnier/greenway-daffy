@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href="{{url_for('static', filename='card.css')}}" rel="stylesheet" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <div class="menubar">
+      <span id="login" class="menu-item highlight"> Login </span>
+      <span id="register" class="menu-item"> Register </span>
+      <span id="console" class="menu-item highlight hidden"> Console </span>
+      <span id="logout" class="menu-item right hidden"> Logout</span>
+    </div>
+    <h2 class="title">GREENWAY PAYMENT PORTAL</h2>
+    <form class="form-container" id="user-form" spellcheck="false">
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" />
+      </div>
+      <div class="form-group">
+        <label for="password" id="pw-label">Password:</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          autocomplete="portal-password"
+        />
+        <button id="eye" type="button" tabindex="-1">
+          <img src="static/images/closed-eye.svg" />
+        </button>
+      </div>
+      <button type="submit" id="login-button">Login</button>
+      <button class="hidden" id="logout-button">Logout</button>
+    </form>
+
+    <div class="login-message hidden" id="login-message"></div>
+
+    <div class="portal hidden">
+      <div class="card" id="main-card">
+        <form spellcheck="false">
+          <textarea
+            rows="2"
+            class="card-input card-bank-name"
+            id="bank-name"
+            name="bank-name"
+            placeholder="(bank)"
+          ></textarea>
+          <div
+            class="card-number card-input stripe-element"
+            id="card-number"
+            name="card-number"
+            type="text"
+          ></div>
+          <div
+            class="card-number last4 card-input"
+            id="last4"
+            name="last4"
+            type="text"
+          >
+            x1234
+          </div>
+          <div
+            class="static-exp card-input"
+            id="static-exp"
+            name="static-exp"
+            type="text"
+          >
+            01/99
+          </div>
+
+          <div
+            class="card-exp card-input stripe-element"
+            id="card-exp"
+            name="card-exp"
+            type="text"
+          ></div>
+          <input
+            class="card-name-input card-input"
+            id="card-name"
+            name="card-name"
+            type="text"
+            placeholder="CARDHOLDER NAME"
+          />
+          <div
+            class="card-cvv-input stripe-element"
+            id="card-cvv"
+            name="card-cvv"
+            type="text"
+          ></div>
+        </form>
+        <div>
+          <img
+            class="card-logo hidden"
+            id="mastercard-logo"
+            src="{{url_for('static', filename='images/mastercard.svg')}}"
+          />
+          <img
+            class="card-logo hidden"
+            id="visa-logo"
+            src="{{url_for('static', filename='images/visa.svg')}}"
+          />
+          <img
+            class="card-logo hidden"
+            id="amex-logo"
+            src="{{url_for('static', filename='images/amex.svg')}}"
+          />
+          <img
+            class="card-logo hidden"
+            id="discover-logo"
+            src="{{url_for('static', filename='images/discover.svg')}}"
+          />
+        </div>
+        <div class="hstreet-logo" id="logo">
+          <div class="logo"></div>
+        </div>
+        <form class="filter" spellcheck="false">
+          <input type="text" id="filter" name="filter" placeholder="filter" />
+        </form>
+      </div>
+
+      <table
+        class="color-table hidden"
+        id="color-table"
+        style="table-layout: fixed"
+        cellspacing="0"
+        cellpadding="0"
+      ></table>
+      <div class="color-palette hidden" id="color-palette"></div>
+      <div class="address">
+        <br />
+        <div class="address-box">
+          <form spellcheck="false">
+            <input
+              class="address-name-input address-input"
+              id="address-name"
+              name="address-name"
+              type="text"
+              placeholder="Name"
+            />
+            <textarea
+              rows="1"
+              class="address-street-input address-input"
+              id="street"
+              name="street"
+              placeholder="Street"
+            ></textarea>
+            <input
+              class="address-city-state-zip-input address-input"
+              id="city-state-zip"
+              name="city-state-zip"
+              type="text"
+              placeholder="City, State Zip"
+            />
+          </form>
+        </div>
+      </div>
+
+      <div class="save-button-div">
+        <button class="finance-btn save-button control-button" id="save">
+          Copy
+        </button>
+        <button class="finance-btn delete-button control-button" id="delete">
+          Delete
+        </button>
+      </div>
+
+      <div class="charge-box">
+        <form>
+          <input
+            class="amount finance-btn"
+            id="amount"
+            name="amount"
+            placeholder="$ 0.00"
+          />
+        </form>
+        <button class="finance-btn charge-button" id="charge">Charge</button>
+      </div>
+
+      <div class="receipts">
+        <div class="receipt">
+          05/09/2025 08:18 AM <br />
+          CARD #: VISA 4242<br />
+          TOTAL: $25.00<br />
+        </div>
+        <div class="receipt">
+          05/04/2025 01:47 PM <br />
+          CARD #: VISA 4242<br />
+          TOTAL: $10.49<br />
+        </div>
+        <div class="receipt">
+          04/29/2025 11:42 AM <br />
+          CARD #: VISA 4242<br />
+          TOTAL: $25.00<br />
+        </div>
+      </div>
+
+      <div class="message hidden" id="message"></div>
+      <div class="dir-message hidden" id="dir-message"></div>
+      <div class="dir-message hidden" id="wide-dir-message"></div>
+
+      <div class="saved-cards" id="saved-cards"></div>
+
+      <div class="new-card">(NEW CARD)</div>
+
+      <script src="https://unpkg.com/axios/dist/axios.js"></script>
+      <script src="https://js.stripe.com/v3/"></script>
+
+      <script src="{{url_for('static', filename='logo.js')}}"></script>
+      <script src="{{url_for('static', filename='card.js')}}"></script>
+    </div>
+    <div id="shadowbox" class="shadowbox"></div>
+  </body>
+</html>

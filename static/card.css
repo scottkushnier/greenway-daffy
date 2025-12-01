@@ -1,0 +1,720 @@
+body {
+  background-color: aliceblue;
+  font-family: sans-serif;
+  user-select: none;
+}
+
+textarea {
+  font-family: sans-serif;
+}
+
+/* div,
+textarea,
+h2,
+form,
+input {
+  
+} */
+
+.menubar {
+  width: 100%;
+  height: 30px;
+  display: flex;
+  background-color: #666;
+}
+
+.menu-item {
+  color: #eee;
+  text-align: left;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 15px;
+  position: relative;
+  top: -8px;
+  user-select: none;
+  cursor: pointer;
+}
+
+span.right {
+  margin-left: auto;
+}
+
+.menu-item:hover {
+  color: #aaa;
+}
+
+.highlight {
+  color: #ff4;
+}
+
+.highlight:hover {
+  color: #ff4;
+}
+
+.title {
+  /* position: absolute; */
+  font-size: 1.5em;
+  text-align: center;
+  padding: 10px 10%;
+  width: 60%;
+  margin: 10px auto;
+  background-color: #0056b3;
+  color: white;
+  border-radius: 4px;
+}
+
+.login {
+  /* position: absolute; */
+
+  /* font-family: sans-serif; */
+}
+
+.form-container {
+  margin-top: 30px;
+  margin-left: 25px;
+  width: 300px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 12px;
+}
+
+label {
+  width: 85px;
+}
+
+input {
+  margin-top: -2px;
+  /* margin-left: 10px; */
+  width: 150px;
+}
+
+#login-button {
+  margin-top: 5px;
+  /* position: absolute;
+  left: 0px;
+  top: 32px; */
+}
+
+/* 
+
+#username {
+  width: 100px;
+} */
+/* 
+#password {
+  position: relative;
+  width: 100px;
+  left: 20px;
+} */
+/* 
+#pw-label {
+  position: relative;
+  left: 20px;
+} */
+
+#eye {
+  background: none;
+  border: none;
+  height: 2px;
+}
+
+/*
+#sign-up-button {
+  position: absolute;
+  left: 60px;
+  top: 32px;
+}
+
+#logout-button {
+  position: absolute;
+  left: 0px;
+  top: 28px;
+} */
+
+#filter {
+  position: absolute;
+  top: -35px;
+  left: 482px;
+  width: 110px;
+}
+
+.portal {
+  position: absolute;
+  top: 160px;
+  left: 20px;
+  width: 500px;
+  /* background-color: royalblue; */
+}
+
+.card {
+  height: 255px;
+  width: 410px;
+  border-radius: 13px;
+  color: white;
+  position: relative;
+  /* top: 220px;
+  left: 60px; */
+}
+
+.card-input {
+  border: none;
+  font-size: 1.2em;
+}
+
+.card-bank-name {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  width: 280px;
+  height: 100px;
+  align: top;
+  font-weight: bold;
+  font-style: italic;
+  font-size: 2.5em;
+  opacity: 35%;
+  border: none;
+  resize: none;
+}
+
+.card-name-input {
+  position: absolute;
+  left: 12px;
+  top: 212px;
+  font-size: 1.2em;
+  /* width: fit-content; */
+  width: 280px;
+  text-transform: uppercase;
+}
+
+.card-number {
+  position: absolute;
+  left: 12px;
+  top: 152px;
+  width: 250px;
+}
+
+.last4 {
+  position: absolute;
+  display: none;
+  left: 15px;
+  top: 154px;
+  width: 100px;
+  /* user-select: none; */
+}
+
+.static-exp {
+  position: absolute;
+  display: none;
+  /* display: none; */
+  left: 15px;
+  top: 177px;
+  width: 100px;
+  /* user-select: none; */
+}
+
+.static {
+  user-select: none;
+}
+
+.card-exp {
+  position: absolute;
+  left: 12px;
+  top: 177px;
+  width: 75px;
+}
+
+.card-input:focus {
+  background-color: rgb(255, 255, 255, 0.3);
+  outline: none;
+}
+
+.card-cvv-input {
+  background-color: #aaa;
+  color: #333;
+  border: none;
+  position: absolute;
+  left: 328px;
+  top: 122px;
+  width: 45px;
+}
+
+.card-cvv-input:focus {
+  background-color: rgb(210, 230, 210);
+  outline: none;
+}
+
+#mastercard-logo {
+  position: absolute;
+  left: 312px;
+  top: 192px;
+  width: 80px;
+  height: 48px;
+}
+
+#visa-logo {
+  position: absolute;
+  left: 309px;
+  top: 202px;
+  width: 80px;
+  height: 48px;
+}
+
+#amex-logo {
+  position: absolute;
+  left: 317px;
+  top: 187px;
+  width: 75px;
+  height: 75px;
+}
+
+#discover-logo {
+  position: absolute;
+  left: 312px;
+  top: 178px;
+  width: 80px;
+  height: 80px;
+}
+
+.address-box {
+  position: relative;
+  padding: 15px;
+  background-color: #e8e8e8;
+  height: 63px;
+  width: 255px;
+  border-radius: 13px;
+}
+
+.address-input:focus {
+  background-color: rgb(0, 0, 0, 0.1);
+  outline: none;
+}
+
+.address-input {
+  background-color: #e8e8e8;
+  border: none;
+  font-style: italic;
+  font-size: 1em;
+  resize: none;
+  width: 240px;
+}
+
+.address-name-input {
+  position: relative;
+}
+
+.address-street-input {
+  position: relative;
+  top: 1px;
+}
+
+.address-city-state-zip-input {
+  position: relative;
+  top: -2px;
+  width: 250px;
+}
+
+/* small cards on right side */
+
+.saved-cards {
+  position: absolute;
+  top: -12px;
+  left: 448px;
+  width: 200px;
+  height: 725px;
+  overflow-y: auto;
+  overflow: visible;
+}
+
+.small-card {
+  position: absolute;
+  height: 102px;
+  width: 162px;
+  top: 2px;
+  left: 2px;
+  border-radius: 6px;
+  margin: 10px;
+  opacity: 1;
+  transform: translate(0px, 0px);
+  transition: box-shadow 0.2s ease, transform 0.6s ease, opacity 0.5s ease;
+  /* transition: z-index 0.9s ease; */
+  /* box-shadow: 0 0 50px 30px #fffa; */
+  /* z-index: 20; */
+}
+
+.new-card {
+  position: absolute;
+  top: -2px;
+  left: 458px;
+  height: 102px;
+  width: 162px;
+  border-radius: 6px;
+  /* background-color: #aaa; */
+  border: 2px dotted #888;
+  transform: translate(0px, 0px);
+  transition: transform 0.6s ease;
+  display: flex;
+  justify-content: center; /* horizontal */
+  align-items: center; /* vertical */
+  font-weight: bold;
+  color: #888;
+}
+
+.small-card-outline {
+  /* for highlighting border */
+  position: absolute;
+  height: 106px;
+  width: 166px;
+  top: -5px;
+  left: -5px;
+  border: 3px solid rgb(255, 255, 255, 0); /* transparent border, will be colored later */
+}
+
+/* .small-card:hover .small-card-outline { */
+/* border: 3px solid rgb(255, 128, 0); */
+/* border: 3px solid rgb(255, 128, 0); */
+/* } */
+
+/* .small-card:hover .small-card-outline-selected { */
+/* border: 3px solid rgb(255, 128, 0); */
+/* border: 3px solid green; */
+/* } */
+
+/* .small-card-outline-selected { */
+/* border: 3px solid green; */
+/* }  */
+
+.small-card-text {
+  color: white;
+  user-select: none;
+}
+
+.small-card-bank-name {
+  font-weight: bold;
+  font-style: italic;
+  font-size: 1.2em;
+  border: none;
+  position: absolute;
+  left: 7px;
+  top: 7px;
+  width: 100px;
+  max-height: 32px;
+  overflow: hidden;
+  align: top;
+  resize: none;
+  opacity: 35%;
+}
+
+.small-card-name {
+  font-size: 0.7em;
+  border: none;
+  position: absolute;
+  left: 8px;
+  top: 81px;
+  text-transform: uppercase;
+}
+
+.small-card-last4 {
+  font-size: 0.7em;
+  border: none;
+  position: absolute;
+  left: 9px;
+  top: 48px;
+}
+
+.small-card-exp {
+  font-size: 0.7em;
+  border: none;
+  position: absolute;
+  left: 8px;
+  top: 61px;
+}
+
+.small-visa-logo {
+  width: 32px;
+  height: 19px;
+  position: absolute;
+  top: 77px;
+  left: 122px;
+}
+
+.small-mastercard-logo {
+  width: 32px;
+  height: 19px;
+  position: absolute;
+  top: 76px;
+  left: 123px;
+}
+
+.small-discover-logo {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 67px;
+  left: 123px;
+}
+
+.small-amex-logo {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 71px;
+  left: 124px;
+}
+
+.hidden {
+  display: none;
+}
+
+.hstreet-logo {
+  position: absolute;
+  left: 305px;
+  top: 12px;
+  width: 50px;
+  height: 50px;
+}
+
+.small-hstreet-logo {
+  position: absolute;
+  left: 121px;
+  top: 4px;
+}
+
+.color-cell {
+  width: 10px;
+  height: 8px;
+  border: 1px solid black;
+}
+
+.color-palette-spot {
+  position: absolute;
+  /* top: 190px; */
+  left: 344px;
+  width: 10px;
+  height: 10px;
+  border: 1px solid #888;
+  border-radius: 5px;
+}
+
+.fine-color-cell {
+  width: 8px;
+  height: 7px;
+  border: 1px solid black;
+}
+
+table {
+  margin: 5px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.fine-table {
+  margin: 2px;
+}
+
+.charge-box {
+  margin: 10px;
+  position: relative;
+  border-radius: 0px;
+  /* left: 10px; */
+}
+
+.amount {
+  font-size: 1.25em;
+  font-weight: bold;
+  width: 120px;
+  text-align: right;
+  border-radius: 10px;
+  padding: 5px;
+  background-color: rgb(192, 250, 192);
+  left: 100px;
+  top: 5px;
+  position: absolute;
+}
+
+.charge-button {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: 10px;
+  border-radius: 10px;
+  padding: 5px; /*  code will turn it green when card data is valid */
+  /* background-color: rgb(255, 192, 192); */
+  color: rgb(255, 64, 64);
+  /* background-color: #d0ffd0; */
+  width: 100px;
+  position: absolute;
+  top: -7px;
+  left: -20px;
+}
+
+.receipts {
+  position: relative;
+  top: 80px;
+  left: 0px;
+  font-size: small;
+}
+
+.receipt {
+  /* height: 20px; */
+  width: 150px;
+  position: relative;
+  border: 1px solid #888;
+  background-color: #eee;
+  margin-top: 15px;
+  padding: 7px;
+  font-family: "Courier New", Courier, monospace;
+  line-height: 17px;
+}
+
+.save-button {
+  font-size: 1em;
+  font-weight: bold;
+  margin: 10px;
+  border-radius: 10px;
+  padding: 5px;
+  background-color: #ddd;
+  width: 100px;
+  position: absolute;
+  top: 265px;
+  left: 295px;
+}
+
+.delete-button {
+  font-size: 1em;
+  font-weight: bold;
+  margin: 10px;
+  border-radius: 10px;
+  padding: 5px;
+  background-color: #ddd;
+  width: 100px;
+  position: absolute;
+  top: 312px;
+  left: 295px;
+}
+
+.message {
+  /* font-weight: bold; */
+  position: absolute;
+  font-size: 0.9em;
+  top: 425px;
+  left: 15px;
+  color: rgb(182, 47, 47);
+  background-color: rgb(255, 220, 220);
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  /* background-color: rgb(200, 200, 200); */
+}
+
+.dir-message {
+  /* font-weight: bold; */
+  position: absolute;
+  font-size: 0.8em;
+  top: 440px;
+  left: 15px;
+  color: black;
+  background-color: white;
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid black;
+  z-index: 20;
+  /* background-color: rgb(200, 200, 200); */
+}
+
+.login-message {
+  /* font-weight: bold; */
+  /* position: absolute; */
+  font-size: 0.9em;
+  margin-top: 20px;
+  margin-left: 25px;
+  width: fit-content;
+  color: rgb(182, 47, 47);
+  background-color: rgb(255, 220, 220);
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#fill1 {
+  position: absolute;
+  top: 550px;
+}
+
+#fill2 {
+  position: absolute;
+  top: 550px;
+  left: 50px;
+}
+
+#fill3 {
+  position: absolute;
+  top: 550px;
+  left: 92px;
+}
+
+.shadowbox {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  height: 1000px;
+  width: 1000px;
+  background-color: #0000;
+  transition: background-color 1s ease;
+  z-index: 9;
+  pointer-events: none;
+}
+
+.finance-btn {
+  display: inline-flex; /* Allows easy alignment of icons/text */
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px; /* Slightly rounded corners for a modern look */
+  font-size: 16px;
+  font-weight: 600; /* Bolder text for importance */
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Primary Button (e.g., "Invest Now", "Transfer Funds") */
+.finance-btn:not(.secondary) {
+  background-color: #0056b3; /* Deep blue evokes trust and stability */
+  color: #ffffff;
+}
+
+.finance-btn:not(.secondary):hover {
+  background-color: #004494; /* Slightly darker on hover */
+  transform: translateY(-1px); /* Slight lift effect */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.finance-btn:not(.secondary):active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Secondary Button (e.g., "Learn More", "Cancel") */
+.finance-btn.secondary {
+  background-color: transparent;
+  color: #555555;
+  border: 1px solid #cccccc;
+  box-shadow: none;
+}
+
+.finance-btn.secondary:hover {
+  background-color: #f4f4f4;
+  color: #000000;
+}
+
+/* Focus state for keyboard navigation */
+.finance-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.4);
+}

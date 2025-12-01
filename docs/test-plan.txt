@@ -1,0 +1,12 @@
+
+Create new sign-in.
+Create card - don't enter card details - save it.
+Create card with details.
+Try to charge card.
+Charge again.
+Refresh page.
+Logout & Login same user.
+Create new card & charge to it.
+Delete 2nd card.
+Create new card & charge to it.
+Charge a card without saving it.
