@@ -826,6 +826,13 @@ function cardFiltered(card) {
 }
 
 function hideAndShowCardsForFilter() {
+  // take away "new-card" if filtering cards
+  if (document.querySelector("#filter").value) {
+    document.querySelector(".new-card").style.display = "none";
+  } else {
+    document.querySelector(".new-card").style.display = null;
+  }
+
   for (let card of savedCards) {
     const filterIt = cardFiltered(card);
     const visible = card.div.shown;
