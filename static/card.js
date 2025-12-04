@@ -154,8 +154,8 @@ function makeColorPalette() {
       offset = -step;
     }
     for (let angle = 0; angle < 3.14 * 2; angle += step) {
-      let x = Math.round(344.0 + Math.cos(angle + offset) * 12 * dist);
-      let y = Math.round(195.0 - Math.sin(angle + offset) * 12 * dist);
+      let x = Math.round(344.0 + Math.cos(angle + offset) * 18 * dist);
+      let y = Math.round(195.0 - Math.sin(angle + offset) * 18 * dist);
       // console.log("dist: ", dist, "angle: ", angle, "x,y", x, y);
       colorPalette.innerHTML += `<div class="color-palette-spot" style="top: ${y}px; left: ${x}px; background-color: hsl(${
         angle * 60
@@ -1563,24 +1563,24 @@ document.addEventListener("keydown", function (e) {
 });
 
 const paletteTable = [
-  [10, 0, 0],
+  [5, 0, 0],
   [0, 0, 0.02],
-  [0, 0.15, 0],
-  [-10, 0, 0],
+  [0, 0.1, 0],
+  [-5, 0, 0],
   [0, 0, -0.02],
-  [0, -0.15, 0],
-  [25, 0, 0],
-  [40, 0, 0],
-  [0, 0, 0.05],
-  [0, 0, 0.1],
-  [0, 0.4, 0],
-  [0, 0.6, 0],
-  [-25, 0, 0],
-  [-40, 0, 0],
-  [0, 0, -0.05],
-  [0, 0, -0.1],
-  [0, -0.4, 0],
-  [0, -0.6, 0],
+  [0, -0.1, 0],
+  [10, 0, 0],
+  [20, 0, 0],
+  [0, 0, 0.04],
+  [0, 0, 0.07],
+  [0, 0.2, 0],
+  [0, 0.3, 0],
+  [-10, 0, 0],
+  [-20, 0, 0],
+  [0, 0, -0.04],
+  [0, 0, -0.07],
+  [0, -0.2, 0],
+  [0, -0.3, 0],
   /* fixed, below here */
   [0, 0, 0.4],
   [0, 1, 0.85],

@@ -492,10 +492,10 @@ input {
   position: absolute;
   /* top: 190px; */
   left: 344px;
-  width: 10px;
-  height: 10px;
+  width: 15px;
+  height: 15px;
   border: 1px solid #888;
-  border-radius: 5px;
+  border-radius: 8px;
 }
 
 .fine-color-cell {
