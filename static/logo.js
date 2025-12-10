@@ -1,7 +1,6 @@
 const logoHtml = `
 <svg
    version="1.1"
-   id="svg1"
    viewBox="0 0 36 36"
    sodipodi:docname="logo.svg"
    inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
@@ -609,12 +608,10 @@ const logoHtml = `
        bleed="0" />
   </sodipodi:namedview>
   <g
-     id="g1"
      inkscape:groupmode="layer"
      inkscape:label="1"
      transform="translate(-56.71963,-64.480847)">
     <g
-       id="g2"
        transform="matrix(0.8274376,0,0,0.84145171,9.787677,10.223329)">
       <path
          class="upper-path"

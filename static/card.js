@@ -40,7 +40,7 @@ function computeHSL(red, green, blue) {
 
 function RGBFromString(colorSpec) {
   return colorSpec
-    .substring(4, colorSpec.length - 1)
+    .substring(4, colorSpec.length - 1) // ignore 'RGB('
     .replace(/ /g, "")
     .split(",");
 }
@@ -82,15 +82,86 @@ let saveLogoColor = logoColor;
 let changeColor = false; // are we changing colors & table is up?
 let changeColorObject; // changing card or logo color?
 
-// Fine color changes are done with set of grids.
-//    Each grid has slightly different hue.
-//    Rows change color saturation
-//    Columns change color lightness
-let changeColorFine = false; // "fine" color table for small changes in color
-let fineTables;
-const numFineRows = 7;
-const numFineCols = 7;
-const numFineTables = 5;
+const paletteTable = [
+  [5, 0, 0],
+  [0, 0, 0.02],
+  [0, 0.1, 0],
+  [-5, 0, 0],
+  [0, 0, -0.02],
+  [0, -0.1, 0],
+  [10, 0, 0],
+  [20, 0, 0],
+  [0, 0, 0.04],
+  [0, 0, 0.07],
+  [0, 0.2, 0],
+  [0, 0.3, 0],
+  [-10, 0, 0],
+  [-20, 0, 0],
+  [0, 0, -0.04],
+  [0, 0, -0.07],
+  [0, -0.2, 0],
+  [0, -0.3, 0],
+  /* fixed, below here */
+  [0, 0, 0.4],
+  [0, 1, 0.85],
+  [0, 1, 0.5],
+  [0, 1, 0.25],
+  [30, 1, 0.85],
+  [30, 1, 0.5],
+  [30, 1, 0.25],
+  [60, 1, 0.5],
+  [60, 1, 0.85],
+  [120, 1, 0.25],
+  [120, 1, 0.5],
+  [120, 1, 0.85],
+  [240, 1, 0.25],
+  [240, 1, 0.5],
+  [215, 1, 0.85],
+  [270, 1, 0.5],
+  [270, 1, 0.85],
+  [0, 0, 0.7],
+];
+
+function handleColorForPaletteSpot(div, i, [hue, sat, lum]) {
+  // div.style.backgroundColor = "#888";
+  if (i <= 18) {
+    const newHue = hue + paletteTable[i - 1][0];
+    const newSat = sat + paletteTable[i - 1][1];
+    const newLum = lum + paletteTable[i - 1][2];
+    div.style.backgroundColor = `hsl(${newHue}, ${newSat * 100}%, ${
+      newLum * 100
+    }%)`;
+  } else {
+    const newHue = paletteTable[i - 1][0];
+    const newSat = paletteTable[i - 1][1];
+    const newLum = paletteTable[i - 1][2];
+    div.style.backgroundColor = `hsl(${newHue}, ${newSat * 100}%, ${
+      newLum * 100
+    }%)`;
+  }
+}
+
+function setUpPaletteColors(palette, leaveCenter) {
+  // leaveCenter, on clicking, leave center to go back, if needed later
+  // console.log(palette);
+  let color;
+  // console.log("object: ", changeColorObject);
+  if (changeColorObject == "card") {
+    color = cardColor;
+  } else {
+    color = logoColor;
+  }
+  if (!leaveCenter) {
+    const centerDiv = palette.querySelector("div");
+    centerDiv.style.backgroundColor = color;
+  }
+  base = computeHSLFromRGBString(color);
+  // console.log(base);
+  const allDivs = palette.querySelectorAll("div");
+  for (let i = 1; i < 37; i++) {
+    handleColorForPaletteSpot(allDivs[i], i, base);
+  }
+}
 
 function changeCardColor(color) {
   cardColor = color;
@@ -131,19 +202,8 @@ function changeLogoColor(color) {
   document.querySelector(".lower-path").style.fill = color;
 }
 
-function leavePalette() {
-  console.log("leave palette");
-  if (changeColorObject == "card") {
-    changeCardColor(saveCardColor);
-  } else {
-    changeLogoColor(saveLogoColor);
-  }
-}
-
 function makeColorPalette() {
   colorPalette = document.querySelector(".color-palette");
-  // const subDiv = document.createElement("div");
-  // colorPalette.innerHTML = `<div class="color-palette-spot" style="background-color: hsl(150,100%,50%)>efg</div>`;
   colorPalette.innerHTML += `<div class="color-palette-spot" style="top: 195px; left: 344px; background-color: ${cardColor}"></div>`;
   for (let dist = 1; dist <= 3; dist++) {
     let step = (3.14159 * 2) / dist / 6;
@@ -161,151 +221,59 @@ function makeColorPalette() {
         angle * 60
       },100%,50%)"></div>`;
     }
-    // console.log("dist: ", dist);
   }
 
-  // colorPalette.innerHTML += `<div class="color-palette-spot" style="top: 187px; background-color: hsl(240,100%,50%)"></div>`;
+  function mouseOverPaletteSpot(color) {
+    if (changeColorObject == "card") {
+      saveCardColor = cardColor;
+      const [baseHue, baseSat, baseLum] = computeHSLFromRGBString(cardColor);
+      changeCardColor(color);
+    } else {
+      saveLogoColor = logoColor;
+      const [baseHue, baseSat, baseLum] = computeHSLFromRGBString(logoColor);
+      changeLogoColor(color);
+    }
+  }
+
+  function clickOnPaletteSpot(color) {
+    if (changeColorObject == "card") {
+      changeCardColor(color);
+      saveCardColorChange(color);
+      saveCardColor = color;
+    } else {
+      changeLogoColor(color);
+      saveLogoColorChange(color);
+      saveLogoColor = color;
+    }
+    if (selectedCard) {
+      updateCard(selectedCard);
+    }
+    setUpPaletteColors(document.querySelector(".color-palette"), true); // leave center color alone
+  }
+
+  function leavePalette() {
+    // console.log("leave palette");
+    if (changeColorObject == "card") {
+      changeCardColor(saveCardColor);
+    } else {
+      changeLogoColor(saveLogoColor);
+    }
+  }
+
   for (let div of colorPalette.querySelectorAll("div")) {
     div.addEventListener("mouseover", function (e) {
       const color = e.target.style.backgroundColor; // change color to cell's color from table
-      // console.log(baseHue, baseSat, baseLum);
-      if (changeColorObject == "card") {
-        saveCardColor = cardColor;
-        const [baseHue, baseSat, baseLum] = computeHSLFromRGBString(cardColor);
-        changeCardColor(color);
-      } else {
-        saveLogoColor = logoColor;
-        const [baseHue, baseSat, baseLum] = computeHSLFromRGBString(logoColor);
-        changeLogoColor(color);
-      }
-      // saveCardColorChange(color); // save change to attached saved cards, db, etc.
+      mouseOverPaletteSpot(color);
     });
     div.addEventListener("click", function (e) {
-      console.log("click!");
-      event.stopPropagation();
+      // console.log("click!");
+      e.stopPropagation();
       const color = e.target.style.backgroundColor;
-      if (changeColorObject == "card") {
-        changeCardColor(color);
-        saveCardColorChange(color);
-        saveCardColor = color;
-      } else {
-        changeLogoColor(color);
-        saveLogoColorChange(color);
-        saveLogoColor = color;
-      }
-      if (selectedCard) {
-        updateCard(selectedCard);
-      }
-      setUpPaletteColors(document.querySelector(".color-palette"), true); // leave center color alone
+      clickOnPaletteSpot(color);
     });
     div.addEventListener("mouseleave", leavePalette);
   }
-
-  console.log(colorPalette);
-}
-
-// to allow user to change card and logo colors
-function makeColorTable() {
-  colorTable = document.querySelector(".color-table");
-  // console.log(colorTable);
-  for (let hue of [0, 30, 60, 120, 180, 210, 240, 270]) {
-    const tr = document.createElement("tr");
-    for (let lum of [10, 15, 25, 40, 50, 70, 80, 90]) {
-      // rainbow colors - saturation 100%
-      // use fine color table to change saturation
-      tr.innerHTML += `<td class="color-cell" style="background-color: hsl(${hue},100%,${lum}%)"></td>`;
-    }
-    colorTable.appendChild(tr);
-  }
-  const tr = document.createElement("tr");
-  for (let lum of [0, 15, 25, 40, 50, 75, 90, 100]) {
-    // shades of gray
-    tr.innerHTML += `<td class="color-cell" style="background-color: hsl(0,0%,${lum}%)"></td>`;
-  }
-  colorTable.appendChild(tr);
-  for (td of colorTable.querySelectorAll("td")) {
-    td.addEventListener("mouseover", function (e) {
-      const color = e.target.style.backgroundColor; // change color to cell's color from table
-      if (changeColorObject == "card") {
-        changeCardColor(color);
-        saveCardColorChange(color); // save change to attached saved cards, db, etc.
-      } else if (changeColorObject == "logo") {
-        changeLogoColor(color);
-        saveLogoColorChange(color);
-      }
-    });
-  }
-  colorTable.addEventListener("mouseleave", leaveTable);
-}
-
-function makeFineColorTables() {
-  let tables = [];
-  for (k = 0; k < numFineTables; k++) {
-    const table = document.createElement("TABLE");
-    table.style.display = "none";
-    table.classList.add("fine-table");
-    for (let i = 0; i < numFineRows; i++) {
-      const tr = document.createElement("TR");
-      table.appendChild(tr);
-      for (let j = 0; j < numFineCols; j++) {
-        const td = document.createElement("TD");
-        // td.classList.add("color-cell");
-        td.classList.add("fine-color-cell");
-        tr.appendChild(td);
-      }
-    }
-    document
-      .querySelector(".portal")
-      .insertBefore(table, document.querySelector(".address"));
-    for (td of table.querySelectorAll("td")) {
-      td.addEventListener("mouseover", function (e) {
-        const color = e.target.style.backgroundColor;
-        if (changeColorObject == "card") {
-          changeCardColor(color);
-          saveCardColorChange(color);
-        } else if ((changeColorObject = "logo")) {
-          changeLogoColor(color);
-          saveLogoColorChange(color);
-        }
-      });
-    }
-    table.addEventListener("mouseleave", leaveTable);
-    tables.push(table);
-  }
-  return tables;
-}
-
-// Select "variations on a theme" to fill fine color tables using base (current) color.
-function setColorsInFineTables(baseColor) {
-  // console.log("basecolor: ", baseColor);
-  const [baseHue, baseSat, baseLum] = computeHSLFromRGBString(baseColor);
-  const cells = document.querySelectorAll(".fine-color-cell");
-  let cellNum = 0;
-  for (let k = 0; k < numFineTables; k++) {
-    for (let i = 0; i < numFineRows; i++) {
-      for (let j = 0; j < numFineCols; j++) {
-        const hue = baseHue + (k - (numFineTables - 1) / 2) * 8;
-        const sat = baseSat - (i - (numFineRows - 1) / 2) * 0.15;
-        const lum = baseLum + (j - (numFineCols - 1) / 2) * 0.03;
-        const newColor = `hsl(${hue}, ${sat * 100}%, ${lum * 100}%)`;
-        cells[cellNum].style.backgroundColor = newColor;
-        cellNum++;
-      }
-    }
-  }
-}
-
-// if mouse leaves color table, revert to original color
-function leaveTable() {
-  if (changeColor || changeColorFine) {
-    if (changeColorObject == "card") {
-      changeCardColor(saveCardColor);
-      saveCardColorChange(saveCardColor);
-    } else if (changeColorObject == "logo") {
-      changeLogoColor(saveLogoColor);
-      saveLogoColorChange(saveLogoColor);
-    }
-  }
+  // console.log(colorPalette);
 }
 
 function setUpLogoAndColors() {
@@ -314,59 +282,9 @@ function setUpLogoAndColors() {
   logoDiv.innerHTML = logoHtml;
   logoDiv.style.width = "90px";
   logoDiv.style.height = "90px";
+  logoDiv.id = "john";
   changeCardColor(cardColor);
   changeLogoColor(logoColor);
-}
-
-/////////////////////////////////////////////////////////////////////
-// functions to show & hide color tables
-/////////////////////////////////////////////////////////////////////
-
-function showColorTable() {
-  document.querySelector("table").classList.toggle("hidden");
-  changeColor = true;
-}
-
-function hideColorTable() {
-  document.querySelector("table").classList.toggle("hidden");
-  changeColor = false;
-  if (selectedCard) {
-    updateCard(selectedCard);
-  }
-}
-
-function showFineColorTables() {
-  document.querySelectorAll(".fine-table").forEach(function (table) {
-    table.style.display = "inline";
-    table.classList.toggle("hidden");
-  });
-  let baseColor;
-  if (changeColorObject == "card") {
-    baseColor = cardColor;
-  } else if (changeColorObject == "logo") {
-    baseColor = logoColor;
-  }
-  setColorsInFineTables(baseColor);
-  changeColorFine = true;
-}
-
-function hideFineColorTables() {
-  document.querySelectorAll(".fine-table").forEach(function (table) {
-    table.style.display = "none";
-    table.classList.toggle("hidden");
-  });
-  changeColorFine = false;
-  if (selectedCard) {
-    updateCard(selectedCard);
-  }
-}
-
-// hide buttons to declutter when putting up color tables
-function Toggle_Buttons() {
-  const buttons = document.querySelectorAll(".control-button");
-  for (let button of buttons) {
-    button.classList.toggle("hidden");
-  }
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -375,9 +293,7 @@ function Toggle_Buttons() {
 
 setUpLogoAndColors();
 setUpFocusEventsForInputFields();
-makeColorTable();
 makeColorPalette();
-makeFineColorTables();
 
 let saveName;
 
@@ -465,22 +381,7 @@ document.querySelector("#main-card").addEventListener("click", function (e) {
       elementsList[2].focus();
       return;
     }
-    // e.stopPropagation();
-    // console.log("here I am in condition");
-    // changeColorObject = "card";
-    // if (!changeColor && !changeColorFine) {
-    //   saveCardColor = cardColor;
-    //   showColorTable();
-    //   Toggle_Buttons();
-    // } else if (changeColor) {
-    //   saveCardColor = cardColor;
-    //   hideColorTable();
-    //   showFineColorTables();
-    // } else if (changeColorFine) {
-    //   hideFineColorTables();
-    //   changeColorFine = false;
-    //   Toggle_Buttons();
-    // }
+
     clickOnCard();
   }
 });
@@ -488,20 +389,6 @@ document.querySelector("#main-card").addEventListener("click", function (e) {
 document.querySelector("#logo").addEventListener("click", function (e) {
   // console.log("click for logo");
   clickOnLogo();
-  // changeColorObject = "logo";
-  // if (!changeColor && !changeColorFine) {
-  //   saveLogoColor = logoColor;
-  //   showColorTable();
-  //   Toggle_Buttons();
-  // } else if (changeColor) {
-  //   saveLogoColor = logoColor;
-  //   hideColorTable();
-  //   showFineColorTables();
-  // } else if (changeColorFine) {
-  //   hideFineColorTables();
-  //   changeColorFine = false;
-  //   Toggle_Buttons();
-  // }
 });
 
 // differentiate if credit card info has already been entered & saved
@@ -701,21 +588,6 @@ document.addEventListener("click", function (e) {
     clickOnCard();
     changeColorObject = null;
   }
-
-  if (changeColor) {
-    hideColorTable();
-    Toggle_Buttons();
-  } else if (changeColorFine) {
-    hideFineColorTables();
-    Toggle_Buttons();
-  }
-  // if (e.pageX > 430) {
-  //   // if click empty area on right side where small cards are, then deselect all
-  //   if (selectedCard) {
-  //     deselectSmallCard();
-  //     clearCard();
-  //   }
-  // }
 });
 
 function divForBrand(brand) {
@@ -799,6 +671,9 @@ function selectCard(card) {
 }
 
 function selectAndLoadCard(card) {
+  if (mainCardHidden) {
+    showMainCard();
+  }
   if (selectedCard == card) {
     return;
   }
@@ -825,16 +700,24 @@ function cardFiltered(card) {
   }
 }
 
-function hideAndShowCardsForFilter() {
-  // take away "new-card" if filtering cards
-  if (document.querySelector("#filter").value) {
-    document.querySelector(".new-card").style.display = "none";
-  } else {
-    document.querySelector(".new-card").style.display = null;
+function getFilterCount() {
+  let filterCount = 0;
+  for (let card of savedCards) {
+    if (!cardFiltered(card)) {
+      filterCount++;
+    }
   }
+  return filterCount;
+}
 
+function hideAndShowCardsForFilter() {
+  console.log("hide and show");
+  let filterCount = 0;
   for (let card of savedCards) {
     const filterIt = cardFiltered(card);
+    if (!filterIt) {
+      filterCount++;
+    }
     const visible = card.div.shown;
     if (filterIt && visible) {
       // console.log("hide: ", card.bankName);
@@ -873,50 +756,28 @@ function hideAndShowCardsForFilter() {
       }
       card.div.shown = true;
       card.div.style.pointerEvents = "auto";
+      if (mainCardHidden) {
+        selectAndLoadCard(card);
+        console.log("selecting ", card);
+        showMainCard();
+      }
     }
+  }
+  console.log("filter count: ", filterCount);
+  const newCard = document.querySelector(".new-card");
+  newCard.style.transform = `translate(0px, ${filterCount * 112}px)`;
+  if (selectedCard && cardFiltered(selectedCard)) {
+    hideMainCard();
   }
 }
 
-function hideAndShowCardsForFilterBad() {
-  for (let card of savedCards) {
-    const filterIt = cardFiltered(card);
-    const visible = card.div.shown;
-    if (filterIt && visible) {
-      console.log("hide: ", card.bankName);
-      card.div.style.opacity = 0;
-      for (let card2 of savedCards) {
-        if (card != card2) {
-          if (card2.div.position > card.div.position) {
-            card2.div.position--;
-            card2.div.style.transform = `translate(0px, ${
-              card2.div.position * 112
-            }px)`;
-          }
-        }
-      }
-      card.div.shown = false;
-      card.div.style.pointerEvents = "none";
-    } else if (!filterIt && !visible) {
-      card.div.style.opacity = 1;
-      for (let card2 of savedCards) {
-        if (card != card2) {
-          if (card2.div.position >= card.div.position) {
-            card2.div.position++;
-            card2.div.style.transform = `translate(0px, ${
-              card2.div.position * 112
-            }px)`;
-          }
-        }
-      }
-      card.div.shown = true;
-      card.div.style.pointerEvents = "auto";
-    }
-  }
+function changeFilterText() {
+  hideAndShowCardsForFilter();
 }
 
 document.querySelector("#filter").addEventListener("keyup", function () {
-  // console.log("filter keydown");
-  hideAndShowCardsForFilter();
+  console.log("filter keydown");
+  changeFilterText();
 });
 
 function getCardSpec(card) {
@@ -970,6 +831,7 @@ function checkSmallCardPlacements(mouseY) {
   const nodeList = document.querySelectorAll(".small-card");
   // console.log("check: ", dragIndex, " ", mouseY);
   for (const node of nodeList) {
+    let nodeMoved = false;
     if (node.shown) {
       if (mouseCardDiv.position > node.position) {
         if (mouseY < node.midY + 30) {
@@ -979,11 +841,13 @@ function checkSmallCardPlacements(mouseY) {
             node.style.transform = `translate(0px, ${
               (node.position + 1) * 112
             }px)`;
+            nodeMoved = true;
           }
         } else if (node.flowOffset != 0) {
           console.log(node.card.bankName, " goes back up");
           node.flowOffset = 0;
           node.style.transform = `translate(0px, ${node.position * 112}px)`;
+          nodeMoved = true;
         }
       } else if (mouseCardDiv.position < node.position) {
         // console.log(node.cardIndex, " is lower");
@@ -994,12 +858,18 @@ function checkSmallCardPlacements(mouseY) {
             node.style.transform = `translate(0px, ${
               (node.position - 1) * 112
             }px)`;
+            nodeMoved = true;
           }
         } else if (node.flowOffset != 0) {
           console.log(node.card.bankName, " goes back down");
           node.flowOffset = 0;
           node.style.transform = `translate(0px, ${node.position * 112}px)`;
+          nodeMoved = true;
         }
+      }
+      if (nodeMoved && node.card == selectedCard) {
+        document.querySelector("#selected-card-indicator").style.transform =
+          node.style.transform;
       }
     }
   }
@@ -1135,8 +1005,16 @@ function updatedMoveds() {
   }
 }
 
+function moveSelectedCardIndicator() {
+  // console.log("indicate: ", selectedCard.div.position);
+  const indicator = document.querySelector("#selected-card-indicator");
+  indicator.style.transform = `translate(0px, ${
+    selectedCard.div.position * 112
+  }px)`;
+}
+
 // create DOM rep for small card in "wallet" at right
-function makeCardDiv(card, isNew) {
+function makeCardDiv(card, position, isNew) {
   const div = document.createElement("div");
   div.innerHTML = `
     <div class="small-card-outline"> </div>
@@ -1151,7 +1029,7 @@ function makeCardDiv(card, isNew) {
   // console.log(div);
   card.div = div;
   div.card = card;
-  div.position = card.index;
+  div.position = position; // SDK - set pos correctly - numCardsShown?
   div.shown = true;
   div.style.transition =
     "box-shadow 0.2s ease, transform 0.6s ease, opacity 0.5s ease";
@@ -1168,6 +1046,7 @@ function makeCardDiv(card, isNew) {
   logoElement.innerHTML = logoHtml;
   logoElement.style.width = "36px";
   logoElement.style.height = "36px";
+  logoElement.id = "junior";
   logoElement.querySelector(".upper-path").style.fill = card.logoColor;
   logoElement.querySelector(".lower-path").style.fill = card.logoColor;
   div.querySelector(".small-card-name").innerText = card.name;
@@ -1195,6 +1074,14 @@ function makeCardDiv(card, isNew) {
     // console.log("click on div");
     const cardDiv = e.target.closest(".small-card");
     mouseIsDown = true;
+    cardMoved = false;
+    if (cardDiv.card == selectedCard) {
+      movingSelectedCard = true;
+      document.querySelector("#selected-card-indicator").style.transition =
+        "transform 0s ease";
+    } else {
+      movingSelectedCard = false;
+    }
     mouseCardDiv = cardDiv;
     mouseDownX = e.pageX;
     mouseDownY = e.pageY;
@@ -1247,7 +1134,7 @@ function makeCardDiv(card, isNew) {
           }
         }
       }
-      console.log("offset tot: ", acc);
+      // console.log("offset tot: ", acc);
       cardDiv.position += -acc;
       console.log(
         "position ",
@@ -1267,6 +1154,11 @@ function makeCardDiv(card, isNew) {
       updatedMoveds();
       mouseCardDiv = null;
     }
+    if (movingSelectedCard) {
+      const indicator = document.querySelector("#selected-card-indicator");
+      indicator.style.transition = `transform 0.6s ease`;
+      indicator.style.transform = `translate(0px, ${cardDiv.position * 112}px)`;
+    }
     cardDiv.style.transform = `translate(0px, ${cardDiv.position * 112}px)`;
     cardDiv.style.transition =
       "box-shadow 0.2s ease, transform 0.6s ease, opacity 0.5s ease";
@@ -1276,37 +1168,40 @@ function makeCardDiv(card, isNew) {
   });
   div.addEventListener("click", function (e) {
     // console.log("click on div");
-    const cardDiv = e.target.closest(".small-card");
-    if (selectedCardDiv) {
-      dehighlightCardDiv(selectedCardDiv);
-    }
-    if (!cardDiv) {
-      return;
-    }
-    if (!selectedCard) {
-      if (
-        document.querySelector("#card-name").value ||
-        document.querySelector("#bank-name").value ||
-        document.querySelector("#street").value ||
-        document.querySelector("#city-state-zip").value ||
-        unsavedPM
-      ) {
-        const confirmed = confirm("This will erase current edits. Continue?");
-        if (!confirmed) {
-          return;
+    if (!cardMoved) {
+      const cardDiv = e.target.closest(".small-card");
+      if (selectedCardDiv) {
+        dehighlightCardDiv(selectedCardDiv);
+      }
+      if (!cardDiv) {
+        return;
+      }
+      if (!selectedCard) {
+        if (
+          // document.querySelector("#card-name").value ||
+          document.querySelector("#bank-name").value ||
+          document.querySelector("#street").value ||
+          document.querySelector("#city-state-zip").value ||
+          unsavedPM
+        ) {
+          const confirmed = confirm("This will erase current edits. Continue?");
+          if (!confirmed) {
+            return;
+          }
         }
       }
-    }
-    selectAndLoadCard(cardDiv.card);
-    cardDiv
-      .querySelector(".small-card-outline")
-      .classList.toggle("small-card-outline-selected");
-    if (selectedCardDiv) {
-      selectedCardDiv
+      selectAndLoadCard(cardDiv.card);
+      moveSelectedCardIndicator(card);
+      cardDiv
         .querySelector(".small-card-outline")
         .classList.toggle("small-card-outline-selected");
+      if (selectedCardDiv) {
+        selectedCardDiv
+          .querySelector(".small-card-outline")
+          .classList.toggle("small-card-outline-selected");
+      }
+      highlightCardDiv(cardDiv);
     }
-    highlightCardDiv(cardDiv);
   });
   document.querySelector(".saved-cards").appendChild(div);
   card.spec = getCardSpec(card);
@@ -1318,9 +1213,16 @@ function makeCardDiv(card, isNew) {
 }
 
 function saveCard(card, isNew) {
+  let numCardsShown = getNumCardsShown();
   savedCards.push(card);
   card.index = savedCards.length - 1;
-  makeCardDiv(card, isNew);
+  let position;
+  if (isNew) {
+    position = numCardsShown;
+  } else {
+    position = card.index;
+  }
+  makeCardDiv(card, position, isNew);
 }
 
 function deselectSmallCard() {
@@ -1338,8 +1240,17 @@ function deselectSmallCard() {
     document.querySelector(".receipts").innerHTML = "";
   }
 }
+function getNumCardsShown() {
+  let count = 0;
+  for (let card of savedCards) {
+    if (card.div.shown) {
+      count++;
+    }
+  }
+  return count;
+}
 
-function newCard() {
+function clickNewCard() {
   // if (cardGood) {
   //   const token = await generateStripeToken();
   //   c.token = token;
@@ -1349,15 +1260,23 @@ function newCard() {
   }
   clearCard();
   c = new Card();
+  c.name = pickName() + " SMITH";
+  c.cardColor = pickColor();
   saveCard(c, true); // isNew
   selectCard(c);
   postNewCard(g_userid, c);
+  changeSmallCardColor(c.cardColor);
+  loadCard(c);
+  if (mainCardHidden) {
+    showMainCard();
+  }
 
   const newCard = document.querySelector(".new-card");
-  newCard.style.transform = `translate(0px, ${savedCards.length * 112}px)`;
+  const numCardsShown = getNumCardsShown();
+  newCard.style.transform = `translate(0px, ${numCardsShown * 112}px)`;
 }
 
-document.querySelector("#save").addEventListener("click", function (e) {
+document.querySelector("#copy").addEventListener("click", function (e) {
   // console.log("save card");
   // save new card
   c = new Card();
@@ -1373,18 +1292,8 @@ document.querySelector("#save").addEventListener("click", function (e) {
   postNewCard(g_userid, c);
 
   const newCard = document.querySelector(".new-card");
-  newCard.style.transform = `translate(0px, ${savedCards.length * 112}px)`;
-
-  // } else {
-  //   // updating already saved card, may need new token
-  //   const token = await generateStripeToken();
-  //   selectedCard.token = token;
-  //   // update last 4 on saved small
-  //   selectedCardDiv.querySelector(".small-card-last4").innerHTML =
-  //     "&#x2022; &#x2022; &#x2022; " + token.last4;
-  // }
-  // deselectSmallCard();
-  // clearCard();
+  const filterCount = getFilterCount(); // need fix for multiple copies
+  newCard.style.transform = `translate(0px, ${filterCount * 112}px)`;
 });
 
 function clearCard() {
@@ -1415,7 +1324,7 @@ function reindexCards() {
   }
 }
 
-document.querySelector("#delete").addEventListener("click", function (e) {
+function clickOnDeleteButton() {
   if (selectedCard) {
     deleteCard(selectedCard);
     const index = selectedCard.index;
@@ -1439,221 +1348,37 @@ document.querySelector("#delete").addEventListener("click", function (e) {
         selectAndLoadCard(savedCards[index]);
       }
     } else {
-      deselectSmallCard();
-      clearCard();
+      let foundOne = false;
+      for (let i = index; i < savedCards.length && !foundOne; i++) {
+        if (!cardFiltered(savedCards[i])) {
+          selectAndLoadCard(savedCards[i]);
+          foundOne = true;
+        }
+      }
+      if (!foundOne) {
+        for (let i = index - 1; i >= 0 && !foundOne; i--) {
+          if (!cardFiltered(savedCards[i])) {
+            selectAndLoadCard(savedCards[i]);
+            foundOne = true;
+          }
+        }
+      }
+      if (!foundOne) {
+        deselectSmallCard();
+        hideMainCard();
+      }
+      // clearCard();
     }
     const newCard = document.querySelector(".new-card");
-    newCard.style.transform = `translate(0px, ${savedCards.length * 112}px)`;
+    const numShown = getNumCardsShown();
+    newCard.style.transform = `translate(0px, ${numShown * 112}px)`;
     return;
   }
+}
+
+document.querySelector("#delete").addEventListener("click", function (e) {
+  clickOnDeleteButton();
 });
-
-// using arrow keys to select card or move cards around
-
-function selectNextCard() {
-  let newIndex;
-  if (!selectedCard) {
-    newIndex = 0;
-  } else if (selectedCard.index == savedCards.length - 1) {
-    deselectSmallCard();
-    clearCard();
-    return;
-  } else {
-    newIndex = selectedCard.index + 1;
-  }
-  selectAndLoadCard(savedCards[newIndex]);
-}
-
-function selectPreviousCard() {
-  let newIndex;
-  if (!selectedCard) {
-    newIndex = savedCards.length - 1;
-  } else if (selectedCard.index == 0) {
-    deselectSmallCard();
-    clearCard();
-    return;
-  } else {
-    newIndex = selectedCard.index - 1;
-  }
-  selectAndLoadCard(savedCards[newIndex]);
-}
-
-function pushCardDown() {
-  if (!selectedCard || selectedCard.index == savedCards.length - 1) {
-    return;
-  }
-  if (document.querySelector("#filter").value) {
-    showTempMessage(
-      "Sorry - can't shift cards with filter in place.",
-      (dur = 2000)
-    );
-    return;
-  }
-  // console.log("push card down");
-  selectedCardDiv.parentNode.insertBefore(
-    selectedCardDiv,
-    selectedCardDiv.nextSibling.nextSibling
-  );
-  {
-    const ind = selectedCard.index;
-    const tempCard = savedCards[ind];
-    savedCards[ind] = savedCards[ind + 1];
-    savedCards[ind + 1] = tempCard;
-    savedCards[ind].index = ind;
-    savedCards[ind + 1].index = ind + 1;
-    updateCard(savedCards[ind]); // sync with db for proper indexes
-    updateCard(savedCards[ind + 1]);
-  }
-}
-
-function pushCardUp() {
-  if (!selectedCard || selectedCard.index == 0) {
-    return;
-  }
-  if (document.querySelector("#filter").value) {
-    showTempMessage(
-      "Sorry - can't shift cards with filter in place.",
-      (dur = 2000)
-    );
-    return;
-  }
-  // console.log("push card up");
-  selectedCardDiv.parentNode.insertBefore(
-    selectedCardDiv,
-    selectedCardDiv.previousSibling
-  );
-  {
-    const ind = selectedCard.index;
-    const tempCard = savedCards[ind];
-    savedCards[ind] = savedCards[ind - 1];
-    savedCards[ind - 1] = tempCard;
-    savedCards[ind].index = ind;
-    savedCards[ind - 1].index = ind - 1;
-    updateCard(savedCards[ind]); // sync with db for proper indexes
-    updateCard(savedCards[ind - 1]);
-  }
-}
-
-document.addEventListener("keydown", function (e) {
-  // if (e.key == "c") {
-  //   console.log("pressed c");
-  //   doPressC();
-  // } else if (e.key == "d") {
-  //   doPressD();
-  // }
-  if (e.key == "ArrowDown") {
-    if (e.shiftKey) {
-      // console.log("shift down");
-      pushCardDown();
-    } else {
-      // console.log("arrow down");
-      e.preventDefault();
-      selectNextCard();
-    }
-  } else if (e.key == "ArrowUp") {
-    if (e.shiftKey) {
-      // console.log("shift up");
-      pushCardUp();
-    } else {
-      // console.log("arrow down");
-      e.preventDefault();
-      selectPreviousCard();
-    }
-  }
-});
-
-const paletteTable = [
-  [5, 0, 0],
-  [0, 0, 0.02],
-  [0, 0.1, 0],
-  [-5, 0, 0],
-  [0, 0, -0.02],
-  [0, -0.1, 0],
-  [10, 0, 0],
-  [20, 0, 0],
-  [0, 0, 0.04],
-  [0, 0, 0.07],
-  [0, 0.2, 0],
-  [0, 0.3, 0],
-  [-10, 0, 0],
-  [-20, 0, 0],
-  [0, 0, -0.04],
-  [0, 0, -0.07],
-  [0, -0.2, 0],
-  [0, -0.3, 0],
-  /* fixed, below here */
-  [0, 0, 0.4],
-  [0, 1, 0.85],
-  [0, 1, 0.5],
-  [0, 1, 0.25],
-  [30, 1, 0.85],
-  [30, 1, 0.5],
-  [30, 1, 0.25],
-  [60, 1, 0.5],
-  [60, 1, 0.85],
-  [120, 1, 0.25],
-  [120, 1, 0.5],
-  [120, 1, 0.85],
-  [240, 1, 0.25],
-  [240, 1, 0.5],
-  [215, 1, 0.85],
-  [270, 1, 0.5],
-  [270, 1, 0.85],
-  [0, 0, 0.7],
-];
-
-function handleColorForPaletteSpot(div, i, [hue, sat, lum]) {
-  // div.style.backgroundColor = "#888";
-  if (i <= 18) {
-    const newHue = hue + paletteTable[i - 1][0];
-    const newSat = sat + paletteTable[i - 1][1];
-    const newLum = lum + paletteTable[i - 1][2];
-    div.style.backgroundColor = `hsl(${newHue}, ${newSat * 100}%, ${
-      newLum * 100
-    }%)`;
-  } else {
-    const newHue = paletteTable[i - 1][0];
-    const newSat = paletteTable[i - 1][1];
-    const newLum = paletteTable[i - 1][2];
-    div.style.backgroundColor = `hsl(${newHue}, ${newSat * 100}%, ${
-      newLum * 100
-    }%)`;
-  }
-}
-
-function setUpPaletteColors(palette, leaveCenter) {
-  // leaveCenter, on clicking, leave center to go back, if needed later
-  // console.log(palette);
-  let color;
-  console.log("object: ", changeColorObject);
-  if (changeColorObject == "card") {
-    color = cardColor;
-  } else {
-    color = logoColor;
-  }
-  if (!leaveCenter) {
-    const centerDiv = palette.querySelector("div");
-    centerDiv.style.backgroundColor = color;
-  }
-  base = computeHSLFromRGBString(color);
-  console.log(base);
-  const allDivs = palette.querySelectorAll("div");
-  for (let i = 1; i < 37; i++) {
-    handleColorForPaletteSpot(allDivs[i], i, base);
-  }
-}
-
-// function doPressC() {
-//   const palette = document.querySelector(".color-palette");
-//   changeColorObject = "card";
-//   if (palette.classList.contains("hidden")) {
-//     setUpPaletteColors(palette);
-//     palette.classList.remove("hidden");
-//   } else {
-//     palette.classList.add("hidden");
-//     changeColorObject = null;
-//   }
-// }
 
 function clickOnCard() {
   console.log("click on card");
@@ -1669,19 +1394,6 @@ function clickOnCard() {
     switchBrandLogo(selectedCard.brand);
   }
 }
-
-// function doPressD() {
-//   const palette = document.querySelector(".color-palette");
-//   changeColorObject = "logo";
-//   if (palette.classList.contains("hidden")) {
-//     setUpPaletteColors(palette);
-//     palette.classList.remove("hidden");
-//     switchBrandLogo(null);
-//   } else {
-//     palette.classList.add("hidden");
-//     switchBrandLogo(selectedCard.brand);
-//   }
-// }
 
 function clickOnLogo() {
   const palette = document.querySelector(".color-palette");
@@ -1845,16 +1557,6 @@ if (justTesting) {
     "pk_live_51OtXzDBKOM7KLRhMaRHRNKwHdNVhZPxYt0PkUsGFxX6RLinIRZgsfflHUhuIoigwqFqRFYc8vCqMzGIC4zWJsBZB00HtDFLvla"
   );
 }
-
-// for testing
-//  stripe = Stripe(
-//   "pk_test_51OtXzDBKOM7KLRhMXwT5XSCqJINN8uorbh2JoLWcNP3IJpJnfVWjkD5kBqzQyoJgXpJsfdr8Sh0RnreDORfqauVE00TxpI2nFw"
-// );
-
-// for live:
-// const stripe = Stripe(
-//   "pk_live_51OtXzDBKOM7KLRhMaRHRNKwHdNVhZPxYt0PkUsGFxX6RLinIRZgsfflHUhuIoigwqFqRFYc8vCqMzGIC4zWJsBZB00HtDFLvla"
-// );
 
 let currentBrand;
 
@@ -2466,8 +2168,8 @@ document
   .querySelector(".new-card")
   .addEventListener("click", async function (e) {
     e.stopPropagation();
-    console.log("new card");
-    newCard();
+    // console.log("new card");
+    clickNewCard();
   });
 
 async function deleteCard(card) {
@@ -2751,6 +2453,8 @@ let mouseWait = 3200; // num milliseconds to wait before showing help
 let checkInterval = 300; // don't check every instant, only so often
 let restHandled = false; // flag to show that msg was posted, i.e. don't keep posting
 let mouseRestX, mouseRestY; // where mouse last moved to & presumably has stayed
+let cardMoved = false;
+let movingSelectedCard = false;
 
 document.addEventListener("mousemove", function (e) {
   if (e.handled) {
@@ -2762,6 +2466,16 @@ document.addEventListener("mousemove", function (e) {
     mouseCardDiv.style.transform = `translate(0px, ${
       e.pageY - mouseDownY + offset
     }px)`;
+
+    if (movingSelectedCard) {
+      document.querySelector(
+        "#selected-card-indicator"
+      ).style.transform = `translate(0px, ${e.pageY - mouseDownY + offset}px)`;
+    }
+
+    if (e.pageY - mouseDownY > 5 || mouseDownY - e.pageY > 5) {
+      cardMoved = true;
+    }
 
     checkSmallCardPlacements(e.pageY);
     // console.log("mouse down: ", mouseDownX, " ", mouseDownY);
@@ -3047,3 +2761,25 @@ document.querySelector("#logout").addEventListener("click", function (e) {
   console.log("clicked logout");
   logoutButton(e);
 });
+
+let mainCardHidden = false;
+
+function hideMainCard() {
+  const card = document.querySelector("#main-card");
+  const under = document.querySelector("#under-card");
+  card.style.opacity = 0;
+  under.style.opacity = 0;
+  card.style.pointerEvents = "none";
+  under.style.pointerEvents = "none";
+  mainCardHidden = true;
+}
+
+function showMainCard() {
+  const card = document.querySelector("#main-card");
+  const under = document.querySelector("#under-card");
+  card.style.opacity = 1;
+  under.style.opacity = 1;
+  card.style.pointerEvents = null;
+  under.style.pointerEvents = null;
+  mainCardHidden = false;
+}

@@ -114,11 +114,10 @@
         <div class="hstreet-logo" id="logo">
           <div class="logo"></div>
         </div>
-        <form class="filter" spellcheck="false">
-          <input type="text" id="filter" name="filter" placeholder="filter" />
-        </form>
       </div>
-
+      <form class="filter" spellcheck="false">
+        <input type="text" id="filter" name="filter" placeholder="filter" />
+      </form>
       <table
         class="color-table hidden"
         id="color-table"
@@ -127,80 +126,65 @@
         cellpadding="0"
       ></table>
       <div class="color-palette hidden" id="color-palette"></div>
-      <div class="address">
-        <br />
-        <div class="address-box">
-          <form spellcheck="false">
+      <div id="under-card">
+        <div class="address">
+          <br />
+          <div class="address-box">
+            <form spellcheck="false">
+              <input
+                class="address-name-input address-input"
+                id="address-name"
+                name="address-name"
+                type="text"
+                placeholder="Name"
+              />
+              <textarea
+                rows="1"
+                class="address-street-input address-input"
+                id="street"
+                name="street"
+                placeholder="Street"
+              ></textarea>
+              <input
+                class="address-city-state-zip-input address-input"
+                id="city-state-zip"
+                name="city-state-zip"
+                type="text"
+                placeholder="City, State Zip"
+              />
+            </form>
+          </div>
+        </div>
+
+        <div class="copy-button-div">
+          <button class="finance-btn copy-button control-button" id="copy">
+            Copy
+          </button>
+          <button class="finance-btn delete-button control-button" id="delete">
+            Delete
+          </button>
+        </div>
+
+        <div class="charge-box">
+          <form>
             <input
-              class="address-name-input address-input"
-              id="address-name"
-              name="address-name"
-              type="text"
-              placeholder="Name"
-            />
-            <textarea
-              rows="1"
-              class="address-street-input address-input"
-              id="street"
-              name="street"
-              placeholder="Street"
-            ></textarea>
-            <input
-              class="address-city-state-zip-input address-input"
-              id="city-state-zip"
-              name="city-state-zip"
-              type="text"
-              placeholder="City, State Zip"
+              class="amount finance-btn"
+              id="amount"
+              name="amount"
+              placeholder="$ 0.00"
             />
           </form>
+          <button class="finance-btn charge-button" id="charge">Charge</button>
         </div>
-      </div>
 
-      <div class="save-button-div">
-        <button class="finance-btn save-button control-button" id="save">
-          Copy
-        </button>
-        <button class="finance-btn delete-button control-button" id="delete">
-          Delete
-        </button>
+        <div class="receipts"></div>
       </div>
-
-      <div class="charge-box">
-        <form>
-          <input
-            class="amount finance-btn"
-            id="amount"
-            name="amount"
-            placeholder="$ 0.00"
-          />
-        </form>
-        <button class="finance-btn charge-button" id="charge">Charge</button>
-      </div>
-
-      <div class="receipts">
-        <div class="receipt">
-          05/09/2025 08:18 AM <br />
-          CARD #: VISA 4242<br />
-          TOTAL: $25.00<br />
-        </div>
-        <div class="receipt">
-          05/04/2025 01:47 PM <br />
-          CARD #: VISA 4242<br />
-          TOTAL: $10.49<br />
-        </div>
-        <div class="receipt">
-          04/29/2025 11:42 AM <br />
-          CARD #: VISA 4242<br />
-          TOTAL: $25.00<br />
-        </div>
-      </div>
-
       <div class="message hidden" id="message"></div>
       <div class="dir-message hidden" id="dir-message"></div>
       <div class="dir-message hidden" id="wide-dir-message"></div>
 
       <div class="saved-cards" id="saved-cards"></div>
-
+      <div id="selected-card-indicator"></div>
       <div class="new-card">(NEW CARD)</div>
 
       <script src="https://unpkg.com/axios/dist/axios.js"></script>
@@ -208,6 +192,7 @@
 
       <script src="{{url_for('static', filename='logo.js')}}"></script>
       <script src="{{url_for('static', filename='card.js')}}"></script>
+      <script src="{{url_for('static', filename='random-cards.js')}}"></script>
     </div>
     <div id="shadowbox" class="shadowbox"></div>
   </body>
