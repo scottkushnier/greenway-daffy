@@ -6,8 +6,22 @@ from flask_bcrypt import Bcrypt
 from models import db, connect_db, WalletCard, User
 from os import getenv
 import os
+import sys
 
-just_testing = True
+print ('TESTING: ', getenv('TESTING'));
+
+if (getenv('TESTING') == 'True'):
+   just_testing = True
+elif (getenv('TESTING') == 'False'):
+   just_testing = False
+else: 
+   print("*** Need to set TESTING env variable. ***")
+   sys.exit(1)
+
+
+
+
+print ('Here in create app.')
 
 if (just_testing):
     stripe.api_key = getenv('STRIPE_API_KEY')
@@ -27,6 +41,7 @@ def create_app():
 
  #   app.config['SQLALCHEMY_ECHO'] = eval(getenv('SQL_ECHO'))
     app.config['SECRET_KEY'] = "midichlor"
+    app.config['TESTING'] = getenv('TESTING')
     connect_db(app)
     make_route_for_home_page(app)
     make_routes_for_api(app)

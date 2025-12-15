@@ -99,7 +99,7 @@ const someNames = [
 
 function pickName() {
   const len = someNames.length;
-  const pick = someNames[Math.floor(Math.random() * len)];
+  const pick = someNames[Math.floor(Math.random() * len)].toUpperCase();
   console.log("name: ", pick);
   return pick;
 }

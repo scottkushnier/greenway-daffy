@@ -1,4 +1,9 @@
-const justTesting = true;
+// const justTesting = true;
+
+let justTesting;
+
+console.log("testing: ", window.APP_CONFIG.testing);
+justTesting = window.APP_CONFIG.testing === "True";
 
 // Global to store logged-in user
 // If F5 / refresh, need to figure out by calling server & look at "session"
@@ -304,7 +309,7 @@ function setUpFocusEventsForInputFields() {
   inputs.forEach(function (input) {
     // console.log("set up focus events for ", input);
     input.addEventListener("focus", function (e) {
-      // console.log("change focus on input: ", input);
+      console.log("change focus on input: ", input);
       if (e.target.classList.contains("card-name-input")) {
         saveName = document.querySelector("#card-name").value;
         if (selectedCard && selectedCard.pmID && !cardInputsShown) {
@@ -558,6 +563,7 @@ function changeSmallInputField(input) {
 
 //////////////////
 
+// general clicks for entire page
 document.addEventListener("click", function (e) {
   // console.log("general click", e);
   if (last4Clicked) {
@@ -587,6 +593,16 @@ document.addEventListener("click", function (e) {
   } else if (changeColorObject == "card") {
     clickOnCard();
     changeColorObject = null;
+  }
+
+  console.log(e.target.id);
+
+  if (selectedPayment && e.target.id !== "amount" && e.target.id !== "charge") {
+    console.log("unselecting");
+    selectedPayment.style.backgroundColor = DEF_REC_COLOR;
+    const button = document.querySelector(".charge-button");
+    button.innerText = "Charge";
+    selectedPayment = null;
   }
 });
 
@@ -761,6 +777,12 @@ function hideAndShowCardsForFilter() {
         console.log("selecting ", card);
         showMainCard();
       }
+    }
+    if (!selectedCard || cardFiltered(selectedCard)) {
+      hideSelectedCardIndicator();
+    } else {
+      showSelectedCardIndicator();
+      moveSelectedCardIndicator();
     }
   }
   console.log("filter count: ", filterCount);
@@ -1013,6 +1035,16 @@ function moveSelectedCardIndicator() {
   }px)`;
 }
 
+function hideSelectedCardIndicator() {
+  const indicator = document.querySelector("#selected-card-indicator");
+  indicator.style.display = "none";
+}
+
+function showSelectedCardIndicator() {
+  const indicator = document.querySelector("#selected-card-indicator");
+  indicator.style.display = null;
+}
+
 // create DOM rep for small card in "wallet" at right
 function makeCardDiv(card, position, isNew) {
   const div = document.createElement("div");
@@ -1192,6 +1224,7 @@ function makeCardDiv(card, position, isNew) {
       }
       selectAndLoadCard(cardDiv.card);
       moveSelectedCardIndicator(card);
+      showSelectedCardIndicator();
       cardDiv
         .querySelector(".small-card-outline")
         .classList.toggle("small-card-outline-selected");
@@ -1270,30 +1303,23 @@ function clickNewCard() {
   if (mainCardHidden) {
     showMainCard();
   }
-
+  moveSelectedCardIndicator();
   const newCard = document.querySelector(".new-card");
   const numCardsShown = getNumCardsShown();
   newCard.style.transform = `translate(0px, ${numCardsShown * 112}px)`;
 }
 
 document.querySelector("#copy").addEventListener("click", function (e) {
-  // console.log("save card");
-  // save new card
   c = new Card();
-  // if (cardGood) {
-  //   const token = await generateStripeToken();
-  //   c.token = token;
-  // }
-  if (selectedCard) {
-    deselectSmallCard();
-  }
+  deselectSmallCard();
   saveCard(c, true); // isNew
   selectCard(c);
   postNewCard(g_userid, c);
-
+  moveSelectedCardIndicator();
+  document.querySelector("#card-name").removeAttribute("readonly");
   const newCard = document.querySelector(".new-card");
-  const filterCount = getFilterCount(); // need fix for multiple copies
-  newCard.style.transform = `translate(0px, ${filterCount * 112}px)`;
+  const numCardsShown = getNumCardsShown();
+  newCard.style.transform = `translate(0px, ${numCardsShown * 112}px)`;
 });
 
 function clearCard() {
@@ -1372,6 +1398,12 @@ function clickOnDeleteButton() {
     const newCard = document.querySelector(".new-card");
     const numShown = getNumCardsShown();
     newCard.style.transform = `translate(0px, ${numShown * 112}px)`;
+    if (!selectedCard || cardFiltered(selectedCard)) {
+      hideSelectedCardIndicator();
+    } else {
+      showSelectedCardIndicator();
+      moveSelectedCardIndicator();
+    }
     return;
   }
 }
@@ -1921,8 +1953,18 @@ document.querySelector("#charge").addEventListener("click", async function (e) {
   // console.log("clicked Charge");
   if (selectedPayment) {
     const amount = Number(document.querySelector("#amount").value.slice(2)); // remove leading '$
+    if (amount == 0) {
+      showTempMessage("Please enter amount.", (dur = 3000));
+      document.querySelector("#amount").focus();
+    }
     if (amount > 0) {
+      showTempMessage("Processing... (processing refund)");
       postRefund(amount, selectedPayment.payment);
+      const msg = `Processed refund for ${
+        "$" + document.querySelector("#amount").value.slice(2)
+      }`;
+      showTempMessage(msg);
+      document.querySelector("#amount").value = "";
     }
     return;
   }
@@ -1946,7 +1988,7 @@ document.querySelector("#charge").addEventListener("click", async function (e) {
     showTempMessage("Processing... (processing charge)");
     const custID = await getCustomerID(name);
     const res2 = await postNewCharge(amount, custID, pmID);
-    // console.log("res2: ", res2);
+    console.log("res2: ", res2);
     if (res2.data.error) {
       const msg = res2.data.error;
       showTempMessage(msg);
@@ -2489,7 +2531,7 @@ document.addEventListener("mousemove", function (e) {
       highlightedCardDiv = e.target.closest(".small-card");
       // console.log("setting highlighted to ", highlightedCardDiv.card);
       highlightCardDiv(highlightedCardDiv);
-      document.querySelector("#shadowbox").style.backgroundColor = "#0009";
+      document.querySelector("#shadowbox").style.backgroundColor = "#0008";
     }
   }
   if (!e.target.closest(".small-card")) {
@@ -2693,6 +2735,7 @@ function makePaymentDiv(payment) {
   div.classList.add("receipt");
   div.addEventListener("click", function (e) {
     // console.log("click");
+    e.stopPropagation();
     if (e.target == selectedPayment) {
       selectedPayment = null;
       e.target.style.backgroundColor = HIGHLIGHT_REC_COLOR;
